@@ -1,69 +1,35 @@
 package com.example.board.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModel;
+import com.example.board.model.Board;
+import com.example.board.model.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
 
-import java.time.LocalDate;
-import java.util.Date;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
-@ApiModel
+@Entity
+@Data
 public class User {
-    private int uid;
-    private String userId;
-    private String email;
-    private String userName;
-    @JsonFormat(pattern = "yyyy-mm-dd")
-    private Date createdAt;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    public User(int uid, String userId, String email, String userName, Date createdAt) {
-        this.uid=uid;
-        this.userId=userId;
-        this.email=email;
-        this.userName=userName;
-        this.createdAt=createdAt;
-    }
+    private String username;
+    private String password;
+    private Boolean enabled;
 
-    public User() {
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+            name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private List<Role> roles = new ArrayList<>();
 
-    }
-
-    public int getUid() {
-        return uid;
-    }
-
-    public void setUid(int uid) {
-        this.uid = uid;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
+    //@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    //@JsonIgnore
+    private List<Board> boards = new ArrayList<>();
 }
